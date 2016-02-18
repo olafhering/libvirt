@@ -1048,6 +1048,25 @@ libxlDiskSetDiscard(libxl_device_disk *x_disk, virDomainDiskDiscard discard)
     }
 }
 
+static void
+libxlDiskSetScript(libxl_device_disk *x_disk, const char *disk_spec)
+{
+    const char *p = NULL;
+
+    if (disk_spec == NULL)
+        return;
+
+    if (STRPREFIX(disk_spec, "dmmd:"))
+        p = "block-dmmd";
+    else if (STRPREFIX(disk_spec, "drbd:"))
+        p = "block-drbd";
+    else if (STRPREFIX(disk_spec, "npiv:"))
+        p = "block-npiv";
+
+    if (p)
+        x_disk->script = g_strdup("block-dmmd");
+}
+
 static char *
 libxlMakeNetworkDiskSrcStr(virStorageSource *src,
                            const char *username,
@@ -1164,6 +1183,7 @@ libxlMakeNetworkDiskSrc(virStorageSource *src, char **srcstr)
 int
 libxlMakeDisk(virDomainDiskDef *l_disk, libxl_device_disk *x_disk)
 {
+    const char *src = virDomainDiskGetSource(l_disk);
     const char *driver = virDomainDiskGetDriver(l_disk);
     int format = virDomainDiskGetFormat(l_disk);
     virStorageType actual_type = virStorageSourceGetActualType(l_disk->src);
@@ -1177,7 +1197,7 @@ libxlMakeDisk(virDomainDiskDef *l_disk, libxl_device_disk *x_disk)
         if (libxlMakeNetworkDiskSrc(l_disk->src, &x_disk->pdev_path) < 0)
             return -1;
     } else {
-        x_disk->pdev_path = g_strdup(virDomainDiskGetSource(l_disk));
+        x_disk->pdev_path = g_strdup(src);
     }
 
     x_disk->vdev = g_strdup(l_disk->dst);
@@ -1278,6 +1298,7 @@ libxlMakeDisk(virDomainDiskDef *l_disk, libxl_device_disk *x_disk)
     x_disk->readwrite = !l_disk->src->readonly;
     x_disk->is_cdrom = l_disk->device == VIR_DOMAIN_DISK_DEVICE_CDROM ? 1 : 0;
     libxlDiskSetDiscard(x_disk, l_disk->discard);
+    libxlDiskSetScript(x_disk, src);
     /* An empty CDROM must have the empty format, otherwise libxl fails. */
     if (x_disk->is_cdrom && !x_disk->pdev_path)
         x_disk->format = LIBXL_DISK_FORMAT_EMPTY;
