@@ -41,6 +41,8 @@ profile virtxend @sbindir@/virtxend flags=(attach_disconnected) {
   /usr/{lib,lib64,libexec}/xen/bin/* Ux,
   /usr/{lib,libexec}/xen-*/bin/libxl-save-helper PUx,
   /usr/{lib,libexec}/xen-*/bin/pygrub PUx,
+  /usr/lib64/qemu-*.*/bin/qemu-system-i386 rmix,
+  /usr/lib64/qemu-*.*/bin/qemu-system-x86_64 rmix,
 
   # force the use of virt-aa-helper
   audit deny /{usr/,}sbin/apparmor_parser rwxl,
