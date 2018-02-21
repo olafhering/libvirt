@@ -3,8 +3,8 @@ module Test_@DAEMON_NAME@ =
 
    test @DAEMON_NAME_UC@.lns get conf =
 @CUT_ENABLE_IP@
-        { "listen_tls" = "0" }
-        { "listen_tcp" = "1" }
+        { "listen_tls" = "1" }
+        { "listen_tcp" = "0" }
         { "tls_port" = "16514" }
         { "tcp_port" = "16509" }
         { "listen_addr" = "192.168.0.1" }
@@ -17,7 +17,7 @@ module Test_@DAEMON_NAME@ =
         { "auth_unix_ro" = "@default_auth@" }
         { "auth_unix_rw" = "@default_auth@" }
 @CUT_ENABLE_IP@
-        { "auth_tcp" = "sasl" }
+        { "auth_tcp" = "none" }
         { "auth_tls" = "none" }
         { "tcp_min_ssf" = "112" }
 @END@
