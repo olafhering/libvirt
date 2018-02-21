@@ -26,6 +26,7 @@
 
 #include "viralloc.h"
 #include "virconf.h"
+#include "virfile.h"
 #include "virlog.h"
 #include "virnetclient.h"
 #include "virobject.h"
@@ -177,6 +178,9 @@ virAdmGetDefaultURI(virConf *conf, char **uristr)
             /* Since we can't probe connecting via any hypervisor driver as libvirt
              * does, if no explicit URI was given and neither the environment
              * variable, nor the configuration parameter had previously been set,
+             */
+#if 0
+            /*
              * we set the default admin server URI to 'libvirtd:///system' or
              * 'libvirtd:///session' depending on the process's EUID.
              */
@@ -185,6 +189,32 @@ virAdmGetDefaultURI(virConf *conf, char **uristr)
             } else {
                 *uristr = g_strdup("libvirtd:///session");
             }
+#else
+#define HYPERVISOR_CAPABILITIES "/proc/xen/capabilities"
+            if (virFileExists(HYPERVISOR_CAPABILITIES)) {
+                int status;
+                g_autofree char *output = NULL;
+                /*
+                 * Don't load if not running on a Xen control domain (dom0). It is not
+                 * sufficient to check for the file to exist as any guest can mount
+                 * xenfs to /proc/xen.
+                 */
+                status = virFileReadAll(HYPERVISOR_CAPABILITIES, 10, &output);
+                if (status >= 0)
+                    status = strncmp(output, "control_d", 9);
+                if (status == 0) {
+                    if (geteuid() == 0)
+                        *uristr = g_strdup("xen:///system");
+                    else
+                        *uristr = g_strdup("xen:///session");
+                }
+            } else {
+                if (geteuid() == 0)
+                    *uristr = g_strdup("qemu:///system");
+                else
+                    *uristr = g_strdup("qemu:///session");
+            }
+#endif
         }
     }
 
