@@ -98,11 +98,11 @@ daemonConfigNew(bool privileged G_GNUC_UNUSED)
 
 #ifdef WITH_IP
 # ifdef LIBVIRTD
-    data->listen_tls = true; /* Only honoured if --listen is set */
+    data->listen_tls = false; /* Only honoured if --listen is set */
 # else /* ! LIBVIRTD */
     data->listen_tls = false; /* Always honoured, --listen doesn't exist. */
 # endif /* ! LIBVIRTD */
-    data->listen_tcp = false;
+    data->listen_tcp = true;
 
     data->tls_port = g_strdup(LIBVIRTD_TLS_PORT);
     data->tcp_port = g_strdup(LIBVIRTD_TCP_PORT);
@@ -128,6 +128,7 @@ daemonConfigNew(bool privileged G_GNUC_UNUSED)
 #ifdef WITH_IP
 # if WITH_SASL
     data->auth_tcp = REMOTE_AUTH_SASL;
+    data->auth_tcp = REMOTE_AUTH_NONE;
 # else
     data->auth_tcp = REMOTE_AUTH_NONE;
 # endif
