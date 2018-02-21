@@ -132,6 +132,8 @@ profile virtqemud @sbindir@/virtqemud flags=(attach_disconnected) {
 
    /usr/{lib,lib64,lib/qemu,libexec}/qemu-bridge-helper rmix,
   }
+  /usr/lib64/qemu-*.*/bin/qemu-system-i386 rmix,
+  /usr/lib64/qemu-*.*/bin/qemu-system-x86_64 rmix,
 
 @BEGIN_APPARMOR_3@
   include if exists <local/usr.sbin.virtqemud>
