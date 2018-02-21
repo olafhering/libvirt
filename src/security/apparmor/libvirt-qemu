@@ -101,6 +101,8 @@
   /etc/pki/qemu/** r,
 
   # the various binaries
+  /usr/lib/xen/bin/qemu-system-i386 rmix,
+  /usr/libexec/xen/bin/qemu-system-i386 rmix,
   /usr/bin/kvm rmix,
   /usr/bin/kvm-spice rmix,
   /usr/bin/qemu rmix,
@@ -187,6 +189,9 @@
 
   # for restore
   /{usr/,}bin/bash rmix,
+
+  /run/nscd/passwd r,
+  /run/nscd/group r,
 
   # for usb access
   /dev/bus/usb/ r,
