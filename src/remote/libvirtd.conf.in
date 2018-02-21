@@ -19,8 +19,8 @@
 # It is necessary to setup a CA and issue server certificates before
 # using this capability.
 #
-# This is enabled by default, uncomment this to disable it
-#listen_tls = 0
+# This is disabled by default, uncomment this to enable it
+#listen_tls = 1
 
 # Listen for unencrypted TCP connections on the public TCP/IP port.
 #
@@ -35,8 +35,8 @@
 # SASL mechanisms which support data encryption are allowed. This is
 # DIGEST_MD5 and GSSAPI (Kerberos5)
 #
-# This is disabled by default, uncomment this to enable it.
-#listen_tcp = 1
+# This is enabled by default, uncomment this to disable it.
+#listen_tcp = 0
 
 
 
@@ -191,7 +191,7 @@
 # Don't do this outside of a dev/test scenario. For real world
 # use, always enable SASL and use the GSSAPI or DIGEST-MD5
 # mechanism in @sysconfdir@/sasl2/libvirt.conf
-#auth_tcp = "sasl"
+#auth_tcp = "none"
 
 # Change the authentication scheme for TLS sockets.
 #
