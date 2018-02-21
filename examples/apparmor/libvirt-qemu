@@ -171,6 +171,9 @@
   # for restore
   /{usr/,}bin/bash rmix,
 
+  /run/nscd/passwd r,
+  /run/nscd/group r,
+
   # for usb access
   /dev/bus/usb/ r,
   /etc/udev/udev.conf r,
