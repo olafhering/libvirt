@@ -31,11 +31,12 @@ AC_DEFUN([LIBVIRT_DRIVER_CHECK_INTERFACE], [
     with_interface=no
   fi
 
-  dnl The interface driver depends on the netcf library or udev library
-  case $with_interface:$with_netcf:$with_udev in
+  dnl The interface driver depends on the netcf library, netcontrol library, or
+  dnl udev library
+  case $with_interface:$with_netcf:$with_netcontrol:$with_udev in
     check:*yes*) with_interface=yes ;;
     check:no:no) with_interface=no ;;
-    yes:no:no) AC_MSG_ERROR([Requested the Interface driver without netcf or udev support]) ;;
+    yes:no:no) AC_MSG_ERROR([Requested the Interface driver without netcf, netcontrol, or udev support]) ;;
   esac
 
   if test "$with_interface" = "yes" ; then

@@ -23,7 +23,12 @@
 
 #include <config.h>
 
-#include <netcf.h>
+#ifdef WITH_NETCONTROL
+# include <netcontrol/netcf.h>
+# include <netcontrol/logger.h>
+#else
+# include <netcf.h>
+#endif
 
 #include "virerror.h"
 #include "datatypes.h"
@@ -65,6 +70,37 @@ VIR_ONCE_GLOBAL_INIT(virNetcfDriverState)
 
 static virNetcfDriverStatePtr driver;
 
+#ifdef WITH_NETCONTROL
+static void
+interface_nc_log_driver(const char *category ATTRIBUTE_UNUSED,
+                        int         priority,
+                        const char *func,
+                        const char *file,
+                        long long   line,
+                        const char *msg,
+                        size_t      len  ATTRIBUTE_UNUSED)
+{
+    int vp;
+
+    switch (priority) {
+        case NC_LOG_FATAL:
+        case NC_LOG_ERROR:
+            vp = VIR_LOG_ERROR;
+            break;
+        case NC_LOG_WARN:
+            vp = VIR_LOG_WARN;
+            break;
+        case NC_LOG_INFO:
+            vp = VIR_LOG_INFO;
+            break;
+        case NC_LOG_DEBUG:
+        default:
+            vp = VIR_LOG_DEBUG;
+            break;
+    }
+    virLogMessage(&virLogSelf, vp, file, line, func, 0, "%s", msg);
+}
+#endif
 
 static void
 virNetcfDriverStateDispose(void *obj)
@@ -88,6 +124,10 @@ netcfStateInitialize(bool privileged,
         return -1;
 
     driver->privileged = privileged;
+
+#ifdef WITH_NETCONTROL
+    nc_logger_redirect_to(interface_nc_log_driver);
+#endif
 
     /* open netcf */
     if (ncf_init(&driver->netcf, NULL) != 0) {
@@ -1225,6 +1265,19 @@ static virStateDriver interfaceStateDriver = {
 
 int netcfIfaceRegister(void)
 {
+    struct netcf *netcf;
+
+    /* Initialization of libnetcontrol will fail if NetworkManager is enabled.
+     * Skip registration if ncf_init fails.
+     * TODO: finer-grained check?  E.g. is_nm_enabled()
+     */
+    if (ncf_init(&netcf, NULL) != 0) {
+        VIR_WARN("Failed to intialize libnetcontrol.  Management of interface devices is disabled");
+        return 0;
+    }
+
+    ncf_close(netcf);
+
     if (virRegisterConnectDriver(&interfaceConnectDriver, false) < 0)
         return -1;
     if (virSetSharedInterfaceDriver(&interfaceDriver) < 0)
