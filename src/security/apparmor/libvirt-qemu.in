@@ -179,6 +179,8 @@
   # for Debian/Ubuntu qemu-block-extra / RPMs qemu-block-* (LP: #1554761)
   /usr/{lib,lib64}/qemu/*.so mr,
   /usr/lib/@{multiarch}/qemu/*.so mr,
+  /usr/lib64/qemu-*.*/bin/qemu-system-i386 rmix,
+  /usr/lib64/qemu-*.*/bin/qemu-system-x86_64 rmix,
 
   # let qemu load old shared objects after upgrades (LP: #1847361)
   /{var/,}run/qemu/*/*.so mr,
