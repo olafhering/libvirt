@@ -161,3 +161,22 @@ Libxl_Domain_Need_Memory(libxl_ctx *ctx, libxl_domain_config *d_config, uint64_t
 
     return ret;
 }
+
+static inline int
+Libxl_Get_Free_Memory(libxl_ctx *ctx, uint64_t *memkb)
+{
+    int ret;
+
+#if LIBXL_API_VERSION < 0x040800
+    {
+        uint32_t val32 = 0;
+
+        ret = libxl_get_free_memory(ctx, &val32);
+        *memkb = val32;
+    }
+#else
+    ret = libxl_get_free_memory(ctx, memkb);
+#endif
+
+    return ret;
+}
