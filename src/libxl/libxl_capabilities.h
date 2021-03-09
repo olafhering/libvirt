@@ -83,3 +83,17 @@ Libxl_Retrieve_Domain_Configuration(libxl_ctx *ctx, uint32_t domid, libxl_domain
 
     return ret;
 }
+
+static inline int
+Libxl_Domain_Shutdown(libxl_ctx *ctx, uint32_t domid)
+{
+    int ret;
+
+#if LIBXL_API_VERSION < 0x041300
+    ret = libxl_domain_shutdown(ctx, domid);
+#else
+    ret = libxl_domain_shutdown(ctx, domid, NULL);
+#endif
+
+    return ret;
+}

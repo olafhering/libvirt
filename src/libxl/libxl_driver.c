@@ -1292,7 +1292,7 @@ libxlDomainShutdownFlags(virDomainPtr dom, unsigned int flags)
         goto cleanup;
 
     if (flags & VIR_DOMAIN_SHUTDOWN_PARAVIRT) {
-        ret = libxl_domain_shutdown(cfg->ctx, vm->def->id);
+        ret = Libxl_Domain_Shutdown(cfg->ctx, vm->def->id);
         if (ret == 0)
             goto cleanup;
 
