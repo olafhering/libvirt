@@ -194,3 +194,17 @@ Libxl_Set_Vcpuonline(libxl_ctx *ctx, uint32_t domid, libxl_bitmap *cpumap)
 
     return ret;
 }
+
+static inline int
+Libxl_Send_Trigger(libxl_ctx *ctx, uint32_t domid, libxl_trigger trigger, uint32_t vcpuid)
+{
+    int ret;
+
+#if LIBXL_API_VERSION < 0x041300
+    ret = libxl_send_trigger(ctx, domid, trigger, vcpuid);
+#else
+    ret = libxl_send_trigger(ctx, domid, trigger, vcpuid, NULL);
+#endif
+
+    return ret;
+}
