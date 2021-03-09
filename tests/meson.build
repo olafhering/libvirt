@@ -11,6 +11,7 @@ tests_dep = declare_dependency(
     glib_dep,
     gnutls_dep,
     libnl_dep,
+#   libxl_dep,
     libxml_dep,
     rpc_dep,
     sasl_dep,
