@@ -1396,9 +1396,8 @@ libxlDomainStart(libxlDriverPrivatePtr driver,
 #ifdef LIBXL_HAVE_SRM_V2
         params.stream_version = restore_ver;
 #endif
-        ret = libxl_domain_create_restore(cfg->ctx, &d_config, &domid,
-                                          restore_fd, &params, NULL,
-                                          &aop_console_how);
+        ret = Libxl_Domain_Create_Restore(cfg->ctx, &d_config, &domid, restore_fd,
+                                       &params, &aop_console_how);
         libxl_domain_restore_params_dispose(&params);
     }
     virObjectLock(vm);

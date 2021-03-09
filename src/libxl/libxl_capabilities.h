@@ -52,3 +52,20 @@ libxlMakeDomainCapabilities(virDomainCapsPtr domCaps,
 int
 libxlDomainGetEmulatorType(const virDomainDef *def)
     G_GNUC_NO_INLINE;
+
+static inline int
+Libxl_Domain_Create_Restore(libxl_ctx *ctx, libxl_domain_config *d_config,
+                            uint32_t *domid, int restore_fd,
+                            const libxl_domain_restore_params *params,
+                            const libxl_asyncprogress_how *aop_console_how)
+{
+    int ret;
+
+#if LIBXL_API_VERSION < 0x040700
+    ret = libxl_domain_create_restore(ctx, d_config, domid, restore_fd, params, NULL, aop_console_how);
+#else
+    ret = libxl_domain_create_restore(ctx, d_config, domid, restore_fd, -1, params, NULL, aop_console_how);
+#endif
+
+    return ret;
+}
