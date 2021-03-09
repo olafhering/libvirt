@@ -1298,7 +1298,7 @@ libxlDomainMigrationDstFinish(virConnectPtr dconn,
 
     /* Unpause if requested */
     if (!(flags & VIR_MIGRATE_PAUSED)) {
-        if (libxl_domain_unpause(cfg->ctx, vm->def->id) != 0) {
+        if (Libxl_Domain_Unpause(cfg->ctx, vm->def->id) != 0) {
             virReportError(VIR_ERR_OPERATION_FAILED, "%s",
                            _("Failed to unpause domain"));
             goto cleanup;

@@ -125,3 +125,17 @@ Libxl_Domain_Pause(libxl_ctx *ctx, uint32_t domid)
 
     return ret;
 }
+
+static inline int
+Libxl_Domain_Unpause(libxl_ctx *ctx, uint32_t domid)
+{
+    int ret;
+
+#if LIBXL_API_VERSION < 0x041300
+    ret = libxl_domain_unpause(ctx, domid);
+#else
+    ret = libxl_domain_unpause(ctx, domid, NULL);
+#endif
+
+    return ret;
+}

@@ -593,7 +593,7 @@ libxlDomainShutdownThread(void *opaque)
             goto endjob;
         }
         libxl_evenable_domain_death(cfg->ctx, vm->def->id, 0, &priv->deathW);
-        libxl_domain_unpause(cfg->ctx, vm->def->id);
+        Libxl_Domain_Unpause(cfg->ctx, vm->def->id);
 #endif
     } else {
         VIR_INFO("Unhandled shutdown_reason %d", xl_reason);
@@ -1457,7 +1457,7 @@ libxlDomainStart(libxlDriverPrivatePtr driver,
         goto destroy_dom;
 
     if (!start_paused) {
-        libxl_domain_unpause(cfg->ctx, domid);
+        Libxl_Domain_Unpause(cfg->ctx, domid);
         virDomainObjSetState(vm, VIR_DOMAIN_RUNNING, VIR_DOMAIN_RUNNING_BOOTED);
     } else {
         virDomainObjSetState(vm, VIR_DOMAIN_PAUSED, VIR_DOMAIN_PAUSED_USER);
