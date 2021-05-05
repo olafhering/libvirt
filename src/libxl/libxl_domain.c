@@ -968,49 +968,6 @@ libxlDomainAutoCoreDump(libxlDriverPrivatePtr driver,
     return 0;
 }
 
-int
-libxlDomainSetVcpuAffinities(libxlDriverPrivatePtr driver, virDomainObjPtr vm)
-{
-    g_autoptr(libxlDriverConfig) cfg = libxlDriverConfigGet(driver);
-    virDomainVcpuDefPtr vcpu;
-    libxl_bitmap map;
-    virBitmapPtr cpumask = NULL;
-    size_t i;
-    int ret = -1;
-
-    libxl_bitmap_init(&map);
-
-    for (i = 0; i < virDomainDefGetVcpus(vm->def); ++i) {
-        vcpu = virDomainDefGetVcpu(vm->def, i);
-
-        if (!vcpu->online)
-            continue;
-
-        if (!(cpumask = vcpu->cpumask))
-            cpumask = vm->def->cpumask;
-
-        if (!cpumask)
-            continue;
-
-        if (virBitmapToData(cpumask, &map.map, (int *)&map.size) < 0)
-            goto cleanup;
-
-        if (libxl_set_vcpuaffinity(cfg->ctx, vm->def->id, i, &map, NULL) != 0) {
-            virReportError(VIR_ERR_INTERNAL_ERROR,
-                           _("Failed to pin vcpu '%zu' with libxenlight"), i);
-            goto cleanup;
-        }
-
-        libxl_bitmap_dispose(&map); /* Also returns to freshly-init'd state */
-    }
-
-    ret = 0;
-
- cleanup:
-    libxl_bitmap_dispose(&map);
-    return ret;
-}
-
 static int
 libxlDomainFreeMem(libxl_ctx *ctx, libxl_domain_config *d_config)
 {
@@ -1460,9 +1417,6 @@ libxlDomainStart(libxlDriverPrivatePtr driver,
                        _("libxenlight failed to store userdata"));
         goto destroy_dom;
     }
-
-    if (libxlDomainSetVcpuAffinities(driver, vm) < 0)
-        goto destroy_dom;
 
     if (!start_paused) {
         libxlDomainUnpauseWrapper(cfg->ctx, domid);
