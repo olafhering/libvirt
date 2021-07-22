@@ -1818,7 +1818,7 @@ libxlDriverConfigInit(libxlDriverConfig *cfg)
         return -1;
     }
 
-    cfg->logger = libxlLoggerNew(cfg->logDir, virLogGetDefaultPriority());
+    cfg->logger = libxlLoggerNew(cfg->logDir);
     if (!cfg->logger) {
         VIR_ERROR(_("cannot create logger for libxenlight, disabling driver"));
         return -1;
