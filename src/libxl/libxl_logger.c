@@ -28,6 +28,7 @@
 #include "util/virhash.h"
 #include "util/virthread.h"
 #include "util/virtime.h"
+#include "virstring.h"
 
 #define VIR_FROM_THIS VIR_FROM_LIBXL
 
@@ -130,25 +131,33 @@ libvirt_destroy(xentoollog_logger *logger_in)
 
 
 libxlLogger *
-libxlLoggerNew(const char *logDir, virLogPriority minLevel)
+libxlLoggerNew(const char *logDir)
 {
     xentoollog_logger_libvirt logger;
     g_autofree char *path = NULL;
+    char *xenlight_minlevel = getenv("xenlight_minlevel");
+    int minlevel;
 
-    switch (minLevel) {
-    case VIR_LOG_DEBUG:
-        logger.minLevel = XTL_DEBUG;
-        break;
-    case VIR_LOG_INFO:
-        logger.minLevel = XTL_INFO;
-        break;
-    case VIR_LOG_WARN:
-        logger.minLevel = XTL_WARN;
-        break;
-    case VIR_LOG_ERROR:
-        logger.minLevel = XTL_ERROR;
-        break;
+    if (!(xenlight_minlevel && *xenlight_minlevel &&
+        virStrToLong_i(xenlight_minlevel, NULL, 10, &minlevel) >= 0 &&
+        minlevel > XTL_NONE && minlevel < XTL_NUM_LEVELS)) {
+        minlevel = virLogGetDefaultPriority();
+        switch (minlevel) {
+        case VIR_LOG_DEBUG:
+            minlevel = XTL_DEBUG;
+            break;
+        case VIR_LOG_INFO:
+            minlevel = XTL_INFO;
+            break;
+        case VIR_LOG_WARN:
+            minlevel = XTL_WARN;
+            break;
+        case VIR_LOG_ERROR:
+            minlevel = XTL_ERROR;
+            break;
+        }
     }
+    logger.minLevel = minlevel;
     logger.logDir = logDir;
 
     path = g_strdup_printf("%s/libxl-driver.log", logDir);
