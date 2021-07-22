@@ -617,10 +617,13 @@ libxlMakeDomBuildInfo(virDomainDef *def,
                 case VIR_DOMAIN_HYPERV_RELAXED:
                     /* Already set by base flag */
                     break;
+#ifdef LIBXL_HAVE_VIRIDIAN_SYNIC
                 case VIR_DOMAIN_HYPERV_SYNIC:
                     libxl_bitmap_set(&b_info->u.hvm.viridian_enable,
                                      LIBXL_VIRIDIAN_ENLIGHTENMENT_SYNIC);
                     break;
+#endif
+#ifdef LIBXL_HAVE_VIRIDIAN_STIMER
                 case VIR_DOMAIN_HYPERV_STIMER:
                     /* STIMER implies synic and clock features */
                     libxl_bitmap_set(&b_info->u.hvm.viridian_enable,
@@ -632,6 +635,7 @@ libxlMakeDomBuildInfo(virDomainDef *def,
                     libxl_bitmap_set(&b_info->u.hvm.viridian_enable,
                                      LIBXL_VIRIDIAN_ENLIGHTENMENT_REFERENCE_TSC);
                     break;
+#endif
                 case VIR_DOMAIN_HYPERV_VAPIC:
                     libxl_bitmap_set(&b_info->u.hvm.viridian_enable,
                                      LIBXL_VIRIDIAN_ENLIGHTENMENT_APIC_ASSIST);
@@ -644,10 +648,12 @@ libxlMakeDomBuildInfo(virDomainDef *def,
                     libxl_bitmap_set(&b_info->u.hvm.viridian_enable,
                                      LIBXL_VIRIDIAN_ENLIGHTENMENT_HCALL_REMOTE_TLB_FLUSH);
                     break;
+#ifdef LIBXL_HAVE_VIRIDIAN_HCALL_IPI
                 case VIR_DOMAIN_HYPERV_IPI:
                     libxl_bitmap_set(&b_info->u.hvm.viridian_enable,
                                      LIBXL_VIRIDIAN_ENLIGHTENMENT_HCALL_IPI);
                     break;
+#endif
                 case VIR_DOMAIN_HYPERV_SPINLOCKS:
                 case VIR_DOMAIN_HYPERV_VENDOR_ID:
                     VIR_WARN("Hyper-v flag '%s' specified per-domain but is a global Xen setting and will be ignored.",
@@ -1907,7 +1913,7 @@ libxlDriverConfigInit(libxlDriverConfig *cfg)
         return -1;
     }
 
-    cfg->logger = libxlLoggerNew(cfg->logDir, virLogGetDefaultPriority());
+    cfg->logger = libxlLoggerNew(cfg->logDir);
     if (!cfg->logger) {
         VIR_ERROR(_("cannot create logger for libxenlight, disabling driver"));
         return -1;
