@@ -24,8 +24,7 @@
 
 typedef struct xentoollog_logger_libvirt libxlLogger;
 
-libxlLogger *libxlLoggerNew(const char *logDir,
-                              virLogPriority minLevel);
+libxlLogger *libxlLoggerNew(const char *logDir);
 void libxlLoggerFree(libxlLogger *logger);
 
 void libxlLoggerOpenFile(libxlLogger *logger, int id, const char *name,
